@@ -1,26 +1,66 @@
-# from pyrh import Robinhood
-# import config
-
-# rh = Robinhood()
-# rh.login(username=config.rh_user, password=config.rh_passwd)
-# rh.print_quote("AAPL")
-
-#Import all packages needed
+# Import all packages needed
 import pandas as pd
 import numpy as np
-from config import WEBULL_USERNAME, WEBULL_PASSWORD
+import config as cf
 from progressbar import progressbar
 from webull import webull # for paper trading, import 'paper_webull'
+from pyrh import Robinhood
+import json
 
-#login to webull/authenticate with API
+# Helper Function
+def print_decorator(func):
+    """
+    Overload Print function to pretty print Dictionaries 
+    """
+    def wrapped_func(*args,**kwargs):
+        if isinstance(*args, dict):
+            return func(json.dumps(*args, sort_keys=True, indent=2, default=str))
+        else:
+            return func(*args,**kwargs)
+    return wrapped_func
+print = print_decorator(print)
+
+
+# Login to Robinhood
+rh = Robinhood()
+rh.login(username=cf.ROBINHOOD_USERNAME, password=cf.ROBINHOOD_PASSWORD, challenge_type='sms')
+try: 
+    print("[INFO] Welcome to Robinhood Lord "+ rh.user()['first_name'])
+except Exception as e:
+    print(e)
+    print("[ERROR] login to robinhood failed.")
+
+# Login to Webull
 wb = webull()
-wb.login(WEBULL_USERNAME, WEBULL_PASSWORD)
-# wb.login("WEBULL_USERNAME", "WEBULL_PASSWORD")
+wb.login(cf.WEBULL_USERNAME, cf.WEBULL_PASSWORD)
 try: 
     print(wb.get_account_id())
 except Exception as e:
     print(e)
-    print("login failed.")
+    print("[ERROR] login to webull failed.")
+
+# Robinhood Portfolio Value
+print("===Robinhood Portfolio Value===")
+print(f"Cash  : ${rh.portfolios()['withdrawable_amount']}")
+print(f"Stocks: ${rh.portfolios()['market_value']}")
+print(f"Total : ${rh.portfolios()['equity']}")
+print("")
+
+# Stocks Owned in Robinhood
+print("===My Robinhood Stocks===")
+for s in rh.securities_owned()['results']:
+    sample_instrument = rh.get_url(s['instrument'])
+    print(f"Name  : {sample_instrument['simple_name']}")
+    print(f"Symbol: {sample_instrument['symbol']}")
+    print(f"Shares: {s['quantity']}")
+    print(f"Price : {rh.quote_data(sample_instrument['symbol'])['last_trade_price']}")
+    print(f"Average Cost: {s['average_buy_price']}")
+    print("Quote")
+    print(rh.quote_data(sample_instrument['symbol']))
+    print("Fundamentals")
+    print(rh.get_fundamentals(sample_instrument['symbol']))
+    print("")
+
 
 # print(wb.get_account())
 
