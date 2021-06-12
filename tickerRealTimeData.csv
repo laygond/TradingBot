@@ -1,5 +1,1 @@
-Symbol,High,Low,Open,Close,Volume,MarketCap
-AAPL,,,,125.89,75169343,2100801961984
-AMZN,,,,3206.22,2249749,1616973660160
-TSLA,,,,599.05,24036896,577082818560
-GOOG,,,,2451.76,1297434,1622913056768
+TimeStamp,Symbol,WB High,RH High,WB Low,RH Low,WB Open,RH Open,WB Price,RH Price,WB Volume,RH Volume,WB MarketCap,RH MarketCap,WB RatingTotal,WB StrongBuy,WB Buy,WB Hold,WB UnderPerform,WB Sell,WB TargetLow,WB TargetHigh,WB TargetMean
